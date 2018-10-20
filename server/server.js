@@ -34,6 +34,8 @@ io.on('connection', (socket) => {
     var currentSocket = null;
     var key = null;
 
+    console.log(socket.userId);
+
     //#endregion
 
     //#region join room
@@ -111,6 +113,8 @@ io.on('connection', (socket) => {
 
             console.log(`${currentRoom.user} leaved.`);
 
+            client.HDEL("userRoom",currentSocket);
+            
             var room = await client.hget("userConnected",currentRoom.room || '');
 
             room = JSON.parse(room);
@@ -124,7 +128,7 @@ io.on('connection', (socket) => {
             await client.hset("userConnected",currentRoom.room,JSON.stringify(room));
             
             if(room.userCount === 0){
-                client.DEL(currentRoom.room);
+                client.HDEL("userConnected",currentRoom.room);
             }
         }
 
